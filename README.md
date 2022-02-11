@@ -21,7 +21,7 @@ For more detailed info access the [Swagger](http://localhost:8080/swagger-ui.htm
 - JUnit (Tests)
 - Jacoco (Code Coverage)
 - Rest Assured (Integration Tests)
-- Resilience4j (Circuit-breaker)
+- Resilience4j (Circuit-breaker & Retry)
 
 #### Requirements
 
@@ -71,7 +71,7 @@ With that in place I added schedulers to consume queues and process the events:
   * One to process error events while propagating Products to 3rd party APIs;
   * One for propagate the Events to 3rd party APIs
 
-Last but not least, I have added a Circuit Breaker that will open once 70% of the calls start to fail. After 10 seconds the Circuit Breaker will change to HALF OPEN. Of course this cares of a tune but that is not the goal right now, so I left it as it is. 
+Last but not least, I have added a Circuit Breaker that will open once 70% of the calls start to fail. After 10 seconds the Circuit Breaker will change to HALF OPEN. Of course the Circuit Breaker, alongside with Retry, cares of a tune but that is not the goal right now, so I left them as they are. 
 
 #### Decisions Made
 
@@ -82,7 +82,7 @@ Last but not least, I have added a Circuit Breaker that will open once 70% of th
 5. Swagger Code Gen - The API first strategy is being used a lot among the developers, and it avoids having to create tons of code.
 6. Comments - I think that a well-written code must not have comments unless it is not that simple to explain. It must be understandable by itself. With that in mind, I did not add too many comments over the code while coding this assignment.
 7. Swagger - There is no need for further explanation.
-8. Exclusions on coverage - I have excluded the PhilipsCodeChallengeApplication, Auto-Generated Models (Simple POJOs), and all the Constants files from Jacoco coverage, since those classes are not meant to be tested. Anyway, PhilipsCodeChallengeApplication is tested when we set up the Spring Boot context while running the integration tests.  
+8. Exclusions on coverage - I have excluded the PhilipsCodeChallengeApplication, Auto-Generated Models (Simple POJOs), and all the Constants files from Jacoco coverage, since those classes are not meant to be tested. Anyway, PhilipsCodeChallengeApplication is tested when we set up the Spring Boot context while running the integration tests.
 
 
 #### Improvement Suggestions

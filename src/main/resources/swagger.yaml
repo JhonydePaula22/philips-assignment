@@ -12,7 +12,7 @@ info:
 tags:
   - name: Retrieve Products Endpoints
     description: Endpoint to get Products data
-  - name: Input & Update Products Endpoints
+  - name: Input and Update Products Endpoints
     description: Endpoint to input & update Products data
   - name: Delete Products Endpoint
     description: Endpoint to delete Products
@@ -48,7 +48,7 @@ paths:
                 $ref: "#/components/schemas/ErrorDTO"
     patch:
       tags:
-        - Input & Update Products Endpoints
+        - Input and Update Products Endpoints
       summary: Method to handle PATCH requests. Update Products data
       operationId: updateProduct
       parameters:
@@ -124,7 +124,7 @@ paths:
                 $ref: "#/components/schemas/ErrorDTO"
     post:
       tags:
-        - Input & Update Products Endpoints
+        - Input and Update Products Endpoints
       summary: Method to handle POST requests. Persists New Products data
       operationId: persistProduct
       requestBody:
