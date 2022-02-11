@@ -15,7 +15,7 @@ import static springfox.documentation.spi.DocumentationType.SWAGGER_2;
 
 @Configuration
 @EnableSwagger2
-public class SwaggerConfig extends WebMvcConfigurationSupport {
+public class SwaggerConfiguration extends WebMvcConfigurationSupport {
 
     public static final String TITLE = "WAES / Philips assignment - Scalable Web";
     public static final String DESCRIPTION = "REST API to maintain Products Catalogue";

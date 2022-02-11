@@ -6,11 +6,15 @@ import com.waes.test.exception.InternalServerErrorException;
 import com.waes.test.model.ProductDTO;
 import com.waes.test.model.event.EventEnum;
 import com.waes.test.observer.Observer;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryConfig;
+import io.github.resilience4j.retry.RetryRegistry;
+import io.vavr.collection.Stream;
 import lombok.SneakyThrows;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -25,18 +29,22 @@ import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.function.Supplier;
+
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 @ExtendWith(MockitoExtension.class)
 class HttpUtilsTest {
 
-    private OkHttpClient client = new OkHttpClient();
+    private OkHttpClient client;
+
     @Mock
     private ObjectMapper mapper;
 
-    CircuitBreakerConfig config = CircuitBreakerConfig.ofDefaults();
-    CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(config);
-    private CircuitBreaker circuitBreaker = registry.circuitBreaker("cb-name");
+    private CircuitBreaker circuitBreaker;
+
+    private Retry retry;
 
     @Mock
     private Observer<ProductDTO> productObserver;
@@ -46,7 +54,6 @@ class HttpUtilsTest {
     private MockWebServer mockWebServer;
 
     private static final String CUSTOMER_PATH = "/resource";
-    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     private String url;
 
@@ -54,12 +61,34 @@ class HttpUtilsTest {
     @BeforeEach
     void setUp() throws IOException {
         mockWebServer = new MockWebServer();
-        mockWebServer.start(); //initialise mock web server
+        mockWebServer.start();
 
-        URL mockServerBaseUrl = mockWebServer.url("").url(); //get base url of mockwebserver
-        url = new URL(mockServerBaseUrl, CUSTOMER_PATH).toString(); //append specific url for making request
+        URL mockServerBaseUrl = mockWebServer.url("").url();
 
-        httpUtils = new HttpUtils(client, mapper, circuitBreaker, productObserver);
+        CircuitBreakerConfig config = CircuitBreakerConfig
+                .custom()
+                .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
+                .slidingWindowSize(10)
+                .failureRateThreshold(70.0f)
+                .waitDurationInOpenState(Duration.ofSeconds(10))
+                .permittedNumberOfCallsInHalfOpenState(4)
+                .build();
+        CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(config);
+        circuitBreaker = registry.circuitBreaker("cb-name");
+
+        RetryConfig retryConfig = RetryConfig.custom()
+                .maxAttempts(3)
+                .waitDuration(Duration.of(0, SECONDS))
+                .ignoreExceptions(BadRequestException.class)
+                .build();
+        RetryRegistry retryRegistry = RetryRegistry.of(retryConfig);
+        retry = retryRegistry.retry("retry-name");
+
+        client = new OkHttpClient();
+
+        url = new URL(mockServerBaseUrl, CUSTOMER_PATH).toString();
+
+        httpUtils = new HttpUtils(client, mapper, circuitBreaker, retry, productObserver);
     }
 
     @Test
@@ -142,34 +171,66 @@ class HttpUtilsTest {
     @Test
     @SneakyThrows
     void should_execute_request_and_return_500_error() {
-        Supplier<ProductDTO> getProductsDTOSupplier = () -> httpUtils.executeGetRequest(this.url, ProductDTO.class);
+        Supplier<Void> deleteProductSupplier = () -> httpUtils.executeDeleteRequest(this.url, Void.class);
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(500).setBody("{}"));
 
-        Assertions.assertThrows(InternalServerErrorException.class, () -> httpUtils.executeCall(getProductsDTOSupplier));
+        Assertions.assertThrows(InternalServerErrorException.class, () -> httpUtils.executeCall(deleteProductSupplier));
     }
 
     @Test
     @SneakyThrows
-    void should_execute_get_request_and_fail_to_deserialize_response() {
-        Supplier<ProductDTO> getProductsDTOSupplier = () -> httpUtils.executeGetRequest(this.url, ProductDTO.class);
+    void should_execute_post_request_and_fail_to_deserialize_response() {
+        ProductDTO expected = new ProductDTO();
+        Supplier<ProductDTO> createNewProductSupplier = () -> httpUtils.executePostRequest(this.url, expected, ProductDTO.class);
 
         Answer<String> answer = invocation -> {
             throw new IOException("failed");
         };
 
+        Mockito.when(mapper.writeValueAsString(expected)).thenReturn("{}");
         Mockito.when(mapper.readValue("{}", ProductDTO.class)).thenAnswer(answer);
         mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody("{}"));
 
-        Assertions.assertThrows(InternalServerErrorException.class, () -> httpUtils.executeCall(getProductsDTOSupplier));
+        Assertions.assertThrows(InternalServerErrorException.class, () -> httpUtils.executeCall(createNewProductSupplier));
     }
 
     @Test
     @SneakyThrows
-    void should_execute_get_request_and_fail_due_to_wrong_url() {
-        Supplier<ProductDTO> getProductsDTOSupplier = () -> httpUtils.executeGetRequest("http://localhost:1234", ProductDTO.class);
+    void should_execute_delete_request_and_fail_due_to_wrong_url() {
+        Supplier<Void> deleteProductSupplier = () -> httpUtils.executeDeleteRequest("http://localhost:1234", Void.class);
+
+        Assertions.assertThrows(InternalServerErrorException.class, () -> httpUtils.executeCall(deleteProductSupplier));
+    }
+
+    @Test
+    @SneakyThrows
+    void should_execute_delete_request_and_fail_and_open_cb() {
+        Supplier<Void> deleteProductSupplier = () -> httpUtils.executeDeleteRequest(this.url, Void.class);
+
+        Stream.range(0, 12).forEach((num) -> mockWebServer.enqueue(new MockResponse().setResponseCode(500)));
+
+        for (int i = 0; i <= 11; i++) {
+            if (i < 10) {
+                Assertions.assertThrows(InternalServerErrorException.class, () -> httpUtils.executeCall(deleteProductSupplier));
+            } else {
+                Assertions.assertThrows(CallNotPermittedException.class, () -> httpUtils.executeCall(deleteProductSupplier));
+            }
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void should_execute_request_and_return_500_error_and_retry_3_times() {
+        Supplier<ProductDTO> getProductsDTOSupplier = () -> httpUtils.executeGetRequest(this.url, ProductDTO.class);
+
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500).setBody("{}"));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500).setBody("{}"));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500).setBody("{}"));
 
         Assertions.assertThrows(InternalServerErrorException.class, () -> httpUtils.executeCall(getProductsDTOSupplier));
+
+        Assertions.assertEquals(3, mockWebServer.getRequestCount());
     }
 
 }

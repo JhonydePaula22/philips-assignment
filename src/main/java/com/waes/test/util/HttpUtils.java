@@ -1,6 +1,5 @@
 package com.waes.test.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.waes.test.exception.BadRequestException;
 import com.waes.test.exception.InternalServerErrorException;
@@ -9,6 +8,7 @@ import com.waes.test.model.event.EventEnum;
 import com.waes.test.observer.Observer;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.retry.Retry;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+
 @Slf4j
 @Component
 public class HttpUtils {
@@ -32,16 +33,19 @@ public class HttpUtils {
     private static OkHttpClient client;
     private static ObjectMapper mapper;
     private static CircuitBreaker circuitBreaker;
+    private static Retry retry;
     private static Observer<ProductDTO> productObserver;
 
     public HttpUtils(OkHttpClient client,
                      ObjectMapper mapper,
                      CircuitBreaker circuitBreaker,
+                     Retry retry,
                      @Qualifier("errorObserver")
-                     Observer<ProductDTO> observer) {
+                             Observer<ProductDTO> observer) {
         HttpUtils.client = client;
         HttpUtils.mapper = mapper;
         HttpUtils.circuitBreaker = circuitBreaker;
+        HttpUtils.retry = retry;
         HttpUtils.productObserver = observer;
     }
 
@@ -63,7 +67,9 @@ public class HttpUtils {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
-        return executeRequest(request, clazz);
+        Supplier<RESPONSE> getRequestSupplier = () -> executeRequest(request, clazz);
+        Supplier<RESPONSE> retryingGetRequest = Retry.decorateSupplier(retry, getRequestSupplier);
+        return retryingGetRequest.get();
     }
 
     public <RESPONSE> RESPONSE executeDeleteRequest(String url, Class<RESPONSE> clazz) {
