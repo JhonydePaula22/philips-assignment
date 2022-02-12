@@ -7,7 +7,8 @@ import com.waes.test.model.ProductDTO;
 import com.waes.test.model.ProductsDTO;
 import com.waes.test.model.UpdateProductDTO;
 import com.waes.test.model.entity.ProductEntity;
-import com.waes.test.model.event.EventEnum;
+import com.waes.test.model.event.ActionEnum;
+import com.waes.test.model.event.EventTypeEnum;
 import com.waes.test.observer.Observer;
 import com.waes.test.repository.ProductRepository;
 import com.waes.test.util.ProductsMapperUtils;
@@ -106,7 +107,7 @@ class ProductServiceImplTest {
         ProductDTO productDTO = ProductsMapperUtils.productDtofrom(productEntity);
 
         Mockito.when(repository.save(productEntityArgumentCaptor.capture())).thenReturn(productEntity);
-        Mockito.doNothing().when(observer).notifyObserver(productDTO, EventEnum.CREATE);
+        Mockito.doNothing().when(observer).notifyObserver(productDTO, ActionEnum.CREATE, EventTypeEnum.PROPAGATE);
 
         ProductDTO actual = service.saveProduct(newProductDTO);
 
@@ -114,7 +115,7 @@ class ProductServiceImplTest {
         assertEquals(1, actual.getQuantity());
         assertNotNull(productEntityArgumentCaptor.getValue().getId());
         Mockito.verify(repository, Mockito.times(1)).save(productEntityArgumentCaptor.getValue());
-        Mockito.verify(observer, Mockito.times(1)).notifyObserver(productDTO, EventEnum.CREATE);
+        Mockito.verify(observer, Mockito.times(1)).notifyObserver(productDTO, ActionEnum.CREATE, EventTypeEnum.PROPAGATE);
     }
 
     @Test
@@ -125,7 +126,7 @@ class ProductServiceImplTest {
 
         Mockito.when(repository.save(productEntityArgumentCaptor.capture())).thenReturn(productEntity);
         Mockito.when(repository.countById("1")).thenReturn(1);
-        Mockito.doNothing().when(observer).notifyObserver(productDTO, EventEnum.UPDATE);
+        Mockito.doNothing().when(observer).notifyObserver(productDTO, ActionEnum.UPDATE, EventTypeEnum.PROPAGATE);
 
         ProductDTO actual = service.updateProduct(updateProductDTO, "1");
 
@@ -134,7 +135,7 @@ class ProductServiceImplTest {
         assertNotNull(productEntityArgumentCaptor.getValue().getId());
         Mockito.verify(repository, Mockito.times(1)).save(productEntityArgumentCaptor.getValue());
         Mockito.verify(repository, Mockito.times(1)).countById("1");
-        Mockito.verify(observer, Mockito.times(1)).notifyObserver(productDTO, EventEnum.UPDATE);
+        Mockito.verify(observer, Mockito.times(1)).notifyObserver(productDTO, ActionEnum.UPDATE, EventTypeEnum.PROPAGATE);
     }
 
     @Test
@@ -145,20 +146,20 @@ class ProductServiceImplTest {
         assertThrows(BadRequestException.class, () -> service.updateProduct(updateProductDTO, "1"));
         Mockito.verify(repository, Mockito.times(1)).countById("1");
         Mockito.verify(repository, Mockito.times(0)).save(ArgumentMatchers.any());
-        Mockito.verify(observer, Mockito.times(0)).notifyObserver(ArgumentMatchers.any(), ArgumentMatchers.any());
+        Mockito.verify(observer, Mockito.times(0)).notifyObserver(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
     }
 
     @Test
     void should_delete_product() {
         Mockito.when(repository.countById("1")).thenReturn(1);
         Mockito.doNothing().when(repository).deleteById("1");
-        Mockito.doNothing().when(observer).notifyObserver(new ProductDTO().id("1"), EventEnum.DELETE);
+        Mockito.doNothing().when(observer).notifyObserver(new ProductDTO().id("1"), ActionEnum.DELETE, EventTypeEnum.PROPAGATE);
 
         service.deleteProduct("1");
 
         Mockito.verify(repository, Mockito.times(1)).deleteById("1");
         Mockito.verify(repository, Mockito.times(1)).countById("1");
-        Mockito.verify(observer, Mockito.times(1)).notifyObserver(new ProductDTO().id("1"), EventEnum.DELETE);
+        Mockito.verify(observer, Mockito.times(1)).notifyObserver(new ProductDTO().id("1"), ActionEnum.DELETE, EventTypeEnum.PROPAGATE);
     }
 
     @Test
@@ -169,7 +170,7 @@ class ProductServiceImplTest {
 
         Mockito.verify(repository, Mockito.times(1)).countById("1");
         Mockito.verify(repository, Mockito.times(0)).save(ArgumentMatchers.any());
-        Mockito.verify(observer, Mockito.times(0)).notifyObserver(ArgumentMatchers.any(), ArgumentMatchers.any());
+        Mockito.verify(observer, Mockito.times(0)).notifyObserver(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
     }
 
 }

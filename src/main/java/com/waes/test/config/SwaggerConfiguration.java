@@ -13,6 +13,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import static springfox.documentation.spi.DocumentationType.SWAGGER_2;
 
+/**
+ * Swagger configuration class.
+ *
+ * @author jonathanadepaula
+ */
 @Configuration
 @EnableSwagger2
 public class SwaggerConfiguration extends WebMvcConfigurationSupport {
@@ -23,6 +28,11 @@ public class SwaggerConfiguration extends WebMvcConfigurationSupport {
     public static final String CONTACT_EMAIL = "jonathanpaula22@gmail.com";
     public static final String CONTACT_URL = "https://www.linkedin.com/in/jonathan-de-paula/?locale=en_US";
 
+    /**
+     * Get a {@link Docket} bean.
+     *
+     * @return {@link Docket}
+     */
     @Bean
     public Docket api() {
         return new Docket(SWAGGER_2)
@@ -34,6 +44,11 @@ public class SwaggerConfiguration extends WebMvcConfigurationSupport {
 
     }
 
+    /**
+     * Get the {@link ApiInfo} bean with the developer info.
+     *
+     * @return {@link ApiInfo}
+     */
     private ApiInfo metaData() {
         return new ApiInfoBuilder()
                 .title(TITLE)
@@ -44,6 +59,11 @@ public class SwaggerConfiguration extends WebMvcConfigurationSupport {
                 .build();
     }
 
+    /**
+     * Adds resource handles to the {@link ResourceHandlerRegistry}.
+     *
+     * @param registry
+     */
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("swagger-ui.html")

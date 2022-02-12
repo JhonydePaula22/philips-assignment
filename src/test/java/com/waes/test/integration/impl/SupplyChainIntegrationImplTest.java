@@ -5,7 +5,7 @@ import com.waes.test.integration.SupplyChainIntegration;
 import com.waes.test.model.ProductDTO;
 import com.waes.test.model.ProductsDTO;
 import com.waes.test.model.UpdateProductDTO;
-import com.waes.test.model.event.EventEnum;
+import com.waes.test.model.event.ActionEnum;
 import com.waes.test.util.HttpUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,13 +72,13 @@ class SupplyChainIntegrationImplTest {
     @Test
     void should_create_new_product() {
         ProductDTO expected = new ProductDTO();
-        Mockito.when(httpUtils.executeCallWithObserver(ArgumentMatchers.any(Supplier.class), ArgumentMatchers.eq(expected), ArgumentMatchers.eq(EventEnum.CREATE)))
+        Mockito.when(httpUtils.executeCallWithObserver(ArgumentMatchers.any(Supplier.class), ArgumentMatchers.eq(expected), ArgumentMatchers.eq(ActionEnum.CREATE)))
                 .thenReturn(expected);
 
         ProductDTO actual = integration.createNewProduct(expected);
 
         Assertions.assertEquals(expected, actual);
-        Mockito.verify(httpUtils, Mockito.times(1)).executeCallWithObserver(ArgumentMatchers.any(Supplier.class), ArgumentMatchers.eq(expected), ArgumentMatchers.eq(EventEnum.CREATE));
+        Mockito.verify(httpUtils, Mockito.times(1)).executeCallWithObserver(ArgumentMatchers.any(Supplier.class), ArgumentMatchers.eq(expected), ArgumentMatchers.eq(ActionEnum.CREATE));
     }
 
     @Test
@@ -87,14 +87,14 @@ class SupplyChainIntegrationImplTest {
         ProductDTO expected = new ProductDTO().id("1");
         Mockito.when(httpUtils.executeCall(ArgumentMatchers.any(Supplier.class)))
                 .thenReturn(expected);
-        Mockito.when(httpUtils.executeCallWithObserver(ArgumentMatchers.any(Supplier.class), ArgumentMatchers.eq(expected), ArgumentMatchers.eq(EventEnum.UPDATE)))
+        Mockito.when(httpUtils.executeCallWithObserver(ArgumentMatchers.any(Supplier.class), ArgumentMatchers.eq(expected), ArgumentMatchers.eq(ActionEnum.UPDATE)))
                 .thenReturn(expected);
 
         ProductDTO actual = integration.updateProduct(updateProductDTO, "1");
 
         Assertions.assertEquals(expected, actual);
         Mockito.verify(httpUtils, Mockito.times(1)).executeCall(ArgumentMatchers.any(Supplier.class));
-        Mockito.verify(httpUtils, Mockito.times(1)).executeCallWithObserver(ArgumentMatchers.any(Supplier.class), ArgumentMatchers.eq(expected), ArgumentMatchers.eq(EventEnum.UPDATE));
+        Mockito.verify(httpUtils, Mockito.times(1)).executeCallWithObserver(ArgumentMatchers.any(Supplier.class), ArgumentMatchers.eq(expected), ArgumentMatchers.eq(ActionEnum.UPDATE));
     }
 
     @Test
@@ -112,13 +112,13 @@ class SupplyChainIntegrationImplTest {
         ProductDTO expected = new ProductDTO().id("1");
         Mockito.when(httpUtils.executeCall(ArgumentMatchers.any(Supplier.class)))
                 .thenReturn(expected);
-        Mockito.when(httpUtils.executeCallWithObserver(ArgumentMatchers.any(Supplier.class), ArgumentMatchers.eq(expected), ArgumentMatchers.eq(EventEnum.DELETE)))
+        Mockito.when(httpUtils.executeCallWithObserver(ArgumentMatchers.any(Supplier.class), ArgumentMatchers.eq(expected), ArgumentMatchers.eq(ActionEnum.DELETE)))
                 .thenReturn(expected);
 
         integration.deleteProduct("1");
 
         Mockito.verify(httpUtils, Mockito.times(1)).executeCall(ArgumentMatchers.any(Supplier.class));
-        Mockito.verify(httpUtils, Mockito.times(1)).executeCallWithObserver(ArgumentMatchers.any(Supplier.class), ArgumentMatchers.eq(expected), ArgumentMatchers.eq(EventEnum.DELETE));
+        Mockito.verify(httpUtils, Mockito.times(1)).executeCallWithObserver(ArgumentMatchers.any(Supplier.class), ArgumentMatchers.eq(expected), ArgumentMatchers.eq(ActionEnum.DELETE));
     }
 
     @Test

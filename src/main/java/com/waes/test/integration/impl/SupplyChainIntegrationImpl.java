@@ -5,7 +5,7 @@ import com.waes.test.integration.SupplyChainIntegration;
 import com.waes.test.model.ProductDTO;
 import com.waes.test.model.ProductsDTO;
 import com.waes.test.model.UpdateProductDTO;
-import com.waes.test.model.event.EventEnum;
+import com.waes.test.model.event.ActionEnum;
 import com.waes.test.util.HttpUtils;
 import com.waes.test.util.ProductsMapperUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +15,12 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+/**
+ * Integration class to handle Operations with Supply Chain Service.
+ * Implements {@link SupplyChainIntegration} interface.
+ *
+ * @author jonathanadepaula
+ */
 @Component
 @Slf4j
 public class SupplyChainIntegrationImpl implements SupplyChainIntegration {
@@ -38,11 +44,10 @@ public class SupplyChainIntegrationImpl implements SupplyChainIntegration {
         log.info("Getting All Products from Supply Chain Integration.");
         Supplier<ProductsDTO> getProductsDTOSupplier = () -> httpUtils.executeGetRequest(this.url, ProductsDTO.class);
         Optional<ProductsDTO> optional = Optional.ofNullable(httpUtils.executeCall(getProductsDTOSupplier));
-        if (optional.isPresent()) {
-            return optional.get();
-        }
-        log.warn("The  from Supply Chain Integration API has not returned a list of products.");
-        return new ProductsDTO();
+        return optional.orElseGet(() -> {
+            log.warn("The  from Supply Chain Integration API has not returned a list of products.");
+            return new ProductsDTO();
+        });
     }
 
     @Override
@@ -56,7 +61,7 @@ public class SupplyChainIntegrationImpl implements SupplyChainIntegration {
     public ProductDTO createNewProduct(ProductDTO productDTO) {
         log.info("Creating Product with data {} on Supply Chain Integration.", productDTO);
         Supplier<ProductDTO> createNewProductSupplier = () -> httpUtils.executePostRequest(this.url, productDTO, ProductDTO.class);
-        return httpUtils.executeCallWithObserver(createNewProductSupplier, productDTO, EventEnum.CREATE);
+        return httpUtils.executeCallWithObserver(createNewProductSupplier, productDTO, ActionEnum.CREATE);
     }
 
     @Override
@@ -65,7 +70,7 @@ public class SupplyChainIntegrationImpl implements SupplyChainIntegration {
         validateProductId(productId);
         ProductDTO productDTO = ProductsMapperUtils.productDtofrom(updateProductDTO, productId);
         Supplier<ProductDTO> updateProductSupplier = () -> httpUtils.executePostRequest(this.url, productDTO, ProductDTO.class);
-        return httpUtils.executeCallWithObserver(updateProductSupplier, productDTO, EventEnum.UPDATE);
+        return httpUtils.executeCallWithObserver(updateProductSupplier, productDTO, ActionEnum.UPDATE);
     }
 
     @Override
@@ -73,7 +78,7 @@ public class SupplyChainIntegrationImpl implements SupplyChainIntegration {
         log.info("Deleting product with id {} from Supply Chain Integration.", productId);
         validateProductId(productId);
         Supplier<Void> deleteProductSupplier = () -> httpUtils.executeDeleteRequest(getUrlWithProductId(productId), Void.class);
-        httpUtils.executeCallWithObserver(deleteProductSupplier, new ProductDTO().id(productId), EventEnum.DELETE);
+        httpUtils.executeCallWithObserver(deleteProductSupplier, new ProductDTO().id(productId), ActionEnum.DELETE);
     }
 
     private void validateProductId(String productId) {

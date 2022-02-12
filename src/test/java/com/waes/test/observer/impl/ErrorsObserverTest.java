@@ -1,8 +1,9 @@
 package com.waes.test.observer.impl;
 
 import com.waes.test.model.ProductDTO;
+import com.waes.test.model.event.ActionEnum;
 import com.waes.test.model.event.Event;
-import com.waes.test.model.event.EventEnum;
+import com.waes.test.model.event.EventTypeEnum;
 import com.waes.test.observer.datasource.ObserversQueues;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
@@ -22,14 +23,15 @@ class ErrorsObserverTest {
         ProductDTO productDTO = new ProductDTO().id("1").name("name")
                 .price(new BigDecimal("12.01")).quantity(1);
 
-        errorsObserver.notifyObserver(productDTO, EventEnum.CREATE);
+        errorsObserver.notifyObserver(productDTO, ActionEnum.CREATE, EventTypeEnum.RETRY);
 
         Assertions.assertTrue(ObserversQueues.containsRetryEventsToReprocess());
         Assertions.assertEquals(Event.builder()
                 .id("1").name("name")
                 .price(new BigDecimal("12.01"))
                 .quantity(1)
-                .eventType(EventEnum.CREATE)
+                .action(ActionEnum.CREATE)
+                .eventType(EventTypeEnum.RETRY)
                 .build(), ObserversQueues.poolEventsRetryToBeReprocessed());
     }
 }

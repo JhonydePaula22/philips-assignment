@@ -3,4 +3,6 @@ CREATE TABLE product (
     name VARCHAR(50),
     price DECIMAL,
     quantity INTEGER
-)
+);
+
+CREATE INDEX ID_INDEX ON product(id);

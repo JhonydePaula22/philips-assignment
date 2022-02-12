@@ -10,6 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * {@link Component} to run every given time to process propagation {@link com.waes.test.model.event.Event}.
+ *
+ * @author jonathanadepaula
+ */
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -17,14 +22,12 @@ public class PropagateScheduler {
 
     private final SupplyChainIntegration service;
 
-    // Job will run every minute.
-    // Depending on the business criteria it can be increased or diminished.
     @Scheduled(cron = "*/1 * * * * *")
     public void run() {
         while (ObserversQueues.containsPropagateEventsToReprocess()) {
             log.info("Running scheduler to propagate events");
             Event event = ObserversQueues.poolPropagateEventsToBeReprocessed();
-            switch (event.getEventType()) {
+            switch (event.getAction()) {
                 case CREATE:
                     log.info("Creating product from propagation event {}", event);
                     service.createNewProduct(new ProductDTO()

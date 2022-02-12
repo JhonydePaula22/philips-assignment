@@ -5,7 +5,7 @@ import com.waes.test.TestConstants;
 import com.waes.test.exception.BadRequestException;
 import com.waes.test.exception.InternalServerErrorException;
 import com.waes.test.model.ErrorDTO;
-import com.waes.test.model.event.EventEnum;
+import com.waes.test.model.event.ActionEnum;
 import com.waes.test.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,7 +71,7 @@ class RestExceptionHandlerControllerTest {
     void should_return_ErrorDTO_and_internal_error_when_InternalServerErrorException_happens_with_event_CREATE() throws Exception {
         final ErrorDTO expected = new ErrorDTO().message(INTERNAL_SERVER_ERROR_MESSAGE.concat(String.format(INTERNAL_SERVER_ERROR_CREATE_COMPLEMENT_MESSAGE, "1")));
 
-        Mockito.doThrow(new InternalServerErrorException(MESSAGE, "1", EventEnum.CREATE)).when(productService).getProduct("1", false);
+        Mockito.doThrow(new InternalServerErrorException(MESSAGE, "1", ActionEnum.CREATE)).when(productService).getProduct("1", false);
 
         mockMvc.perform(get(String.format(TestConstants.PRODUCTS_ID_PATH, "1"))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -83,7 +83,7 @@ class RestExceptionHandlerControllerTest {
     void should_return_ErrorDTO_and_internal_error_when_InternalServerErrorException_happens_with_event_UPDATE() throws Exception {
         final ErrorDTO expected = new ErrorDTO().message(INTERNAL_SERVER_ERROR_MESSAGE.concat(INTERNAL_SERVER_ERROR_DELETE_UPDATE_COMPLEMENT_MESSAGE));
 
-        Mockito.doThrow(new InternalServerErrorException(MESSAGE, "1", EventEnum.UPDATE)).when(productService).getProduct("1", false);
+        Mockito.doThrow(new InternalServerErrorException(MESSAGE, "1", ActionEnum.UPDATE)).when(productService).getProduct("1", false);
 
         mockMvc.perform(get(String.format(TestConstants.PRODUCTS_ID_PATH, "1"))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -95,7 +95,7 @@ class RestExceptionHandlerControllerTest {
     void should_return_ErrorDTO_and_internal_error_when_InternalServerErrorException_happens_with_event_DELETE() throws Exception {
         final ErrorDTO expected = new ErrorDTO().message(INTERNAL_SERVER_ERROR_MESSAGE.concat(INTERNAL_SERVER_ERROR_DELETE_UPDATE_COMPLEMENT_MESSAGE));
 
-        Mockito.doThrow(new InternalServerErrorException(MESSAGE, "1", EventEnum.UPDATE)).when(productService).getProduct("1", false);
+        Mockito.doThrow(new InternalServerErrorException(MESSAGE, "1", ActionEnum.UPDATE)).when(productService).getProduct("1", false);
 
         mockMvc.perform(get(String.format(TestConstants.PRODUCTS_ID_PATH, "1"))
                         .contentType(MediaType.APPLICATION_JSON))

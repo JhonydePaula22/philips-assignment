@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.waes.test.exception.BadRequestException;
 import com.waes.test.exception.InternalServerErrorException;
 import com.waes.test.model.ProductDTO;
-import com.waes.test.model.event.EventEnum;
+import com.waes.test.model.event.ActionEnum;
+import com.waes.test.model.event.EventTypeEnum;
 import com.waes.test.observer.Observer;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -140,10 +141,10 @@ class HttpUtilsTest {
     void should_execute_delete_request_with_observer_and_notify_when_status_500() {
         Supplier<Void> deleteProductSupplier = () -> httpUtils.executeDeleteRequest(this.url, Void.class);
 
-        Mockito.doNothing().when(productObserver).notifyObserver(new ProductDTO().id("1"), EventEnum.DELETE);
+        Mockito.doNothing().when(productObserver).notifyObserver(new ProductDTO().id("1"), ActionEnum.DELETE, EventTypeEnum.RETRY);
         mockWebServer.enqueue(new MockResponse().setResponseCode(500).setBody("{}"));
 
-        Assertions.assertThrows(InternalServerErrorException.class, () -> httpUtils.executeCallWithObserver(deleteProductSupplier, new ProductDTO().id("1"), EventEnum.DELETE));
+        Assertions.assertThrows(InternalServerErrorException.class, () -> httpUtils.executeCallWithObserver(deleteProductSupplier, new ProductDTO().id("1"), ActionEnum.DELETE));
     }
 
     @Test
@@ -153,7 +154,7 @@ class HttpUtilsTest {
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200));
 
-        Void actual = httpUtils.executeCallWithObserver(deleteProductSupplier, new ProductDTO().id("1"), EventEnum.DELETE);
+        Void actual = httpUtils.executeCallWithObserver(deleteProductSupplier, new ProductDTO().id("1"), ActionEnum.DELETE);
 
         Assertions.assertNull(actual);
     }

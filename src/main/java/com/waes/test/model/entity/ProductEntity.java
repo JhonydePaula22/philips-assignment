@@ -10,6 +10,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 
+/**
+ * Entity class to be persisted on the product table.
+ *
+ * @author jonathanadepaula
+ */
 @Data
 @Builder
 @AllArgsConstructor

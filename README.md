@@ -79,16 +79,30 @@ Last but not least, I have added a Circuit Breaker that will open once 70% of th
 2. Flyway - Simple setup and very friendly to use while versioning and migrating databases.
 3. Rest Assured - Easy way to implement integration tests.
 4. Jacoco - Easy way to verify how much of the code is covered by unit/integration tests.
-5. Swagger Code Gen - The API first strategy is being used a lot among the developers, and it avoids having to create tons of code.
-6. Comments - I think that a well-written code must not have comments unless it is not that simple to explain. It must be understandable by itself. With that in mind, I did not add too many comments over the code while coding this assignment.
+5. Swagger Code Gen - The API first strategy is being used a lot among the developers, and it avoids having to create
+   tons of code.
+6. Comments - I think that a well-written code must not have comments unless it is not that simple to explain. It must
+   be understandable by itself. With that in mind, I did not add too many comments over the code while coding this
+   assignment.
 7. Swagger - There is no need for further explanation.
-8. Exclusions on coverage - I have excluded the PhilipsCodeChallengeApplication, Auto-Generated Models (Simple POJOs), and all the Constants files from Jacoco coverage, since those classes are not meant to be tested. Anyway, PhilipsCodeChallengeApplication is tested when we set up the Spring Boot context while running the integration tests.
-
+8. Exclusions on coverage - I have excluded the PhilipsCodeChallengeApplication, Auto-Generated Models (Simple POJOs),
+   and all the Constants files from Jacoco coverage, since those classes are not meant to be tested. Anyway,
+   PhilipsCodeChallengeApplication is tested when we set up the Spring Boot context while running the integration tests.
 
 #### Improvement Suggestions
 
-1. Remove the Local Queues and add Cloud based Queue Services (e.g. AWS SQS) so the queues are shared across multiple nodes in a cloud environment.
-   * 1.1 The Propagation schedulers would be replaced by SQS consumers wich would consume every message as soon as they arrive in the Queue.
-   * 1.2 The Error Reprocess schedulers would be replaced by SQS consumers wich would consume every message with a delay from the time the message arrives in the Queue.
-2. Add a file to handle message properties in case of need for internationalization. As it is not needed right now, I left the messages in some constant files.
-3. Replace the unit tests by Spock to make the unit tests to make usage of BDD to bring the business closer to the code.
+1. Remove the Local Queues and add Distributed Queue Services (e.g. AWS SQS) so the queues are shared across multiple
+   nodes in a distributed environment.
+   * 1.1 The Propagation schedulers would be replaced by SQS consumers which would consume every message as soon as they
+     arrive in the Queue.
+   * 1.2 The Error Reprocess schedulers would be replaced by SQS consumers which would consume every message with a
+     delay from the time the message arrives in the Queue.
+2. Remove the Local Cache and add Distributed Cache Services (e.g. Redis) so the cache is shared across multiple nodes
+   in a distributed environment.
+3. Increase the Observability by having a way to monitor the service, by using tools as NewRelic or DataDog. They could
+   give the developers visibility about logs, traces and metrics which helps us to better tune the resources and tackle
+   bugs whenever necessary.
+4. The integration tests should not be run at build time during development. This should be in a different maven task
+   and run during a CI/CD for example. This takes more time to run and should be run on demand and not everytime.
+5. Add a file to handle message properties in case of need for internationalization. As it is not needed right now, I
+   left the messages in some constant files.

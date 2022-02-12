@@ -3,7 +3,8 @@ package com.waes.test.scheduler;
 import com.waes.test.integration.SupplyChainIntegration;
 import com.waes.test.model.ProductDTO;
 import com.waes.test.model.UpdateProductDTO;
-import com.waes.test.model.event.EventEnum;
+import com.waes.test.model.event.ActionEnum;
+import com.waes.test.model.event.EventTypeEnum;
 import com.waes.test.observer.impl.SupplyChainPropagationObserver;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,9 +40,9 @@ class PropagateSchedulerTest {
         ProductDTO productDTO = new ProductDTO().id("1").name("name")
                 .price(new BigDecimal("12.01")).quantity(1);
 
-        supplyChainPropagationObserver.notifyObserver(productDTO, EventEnum.CREATE);
-        supplyChainPropagationObserver.notifyObserver(productDTO, EventEnum.UPDATE);
-        supplyChainPropagationObserver.notifyObserver(productDTO, EventEnum.DELETE);
+        supplyChainPropagationObserver.notifyObserver(productDTO, ActionEnum.CREATE, EventTypeEnum.PROPAGATE);
+        supplyChainPropagationObserver.notifyObserver(productDTO, ActionEnum.UPDATE, EventTypeEnum.PROPAGATE);
+        supplyChainPropagationObserver.notifyObserver(productDTO, ActionEnum.DELETE, EventTypeEnum.PROPAGATE);
 
         scheduler.run();
 

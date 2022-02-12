@@ -10,6 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * {@link Component} to run every given time to process retry {@link com.waes.test.model.event.Event}.
+ *
+ * @author jonathanadepaula
+ */
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -17,14 +22,12 @@ public class ReprocessScheduler {
 
     private final SupplyChainIntegration service;
 
-    // Job will run every 5 minutes.
-    // Depending on the business criteria it can be increased or diminished.
     @Scheduled(cron = "*/5 * * * * *")
     public void run() {
         while (ObserversQueues.containsRetryEventsToReprocess()) {
             log.info("Running scheduler to reprocess error events");
             Event event = ObserversQueues.poolEventsRetryToBeReprocessed();
-            switch (event.getEventType()) {
+            switch (event.getAction()) {
                 case CREATE:
                     log.info("Creating product from reprocessing error event {}", event);
                     service.createNewProduct(new ProductDTO()

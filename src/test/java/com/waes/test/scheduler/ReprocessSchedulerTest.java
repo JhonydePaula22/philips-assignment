@@ -3,7 +3,8 @@ package com.waes.test.scheduler;
 import com.waes.test.integration.SupplyChainIntegration;
 import com.waes.test.model.ProductDTO;
 import com.waes.test.model.UpdateProductDTO;
-import com.waes.test.model.event.EventEnum;
+import com.waes.test.model.event.ActionEnum;
+import com.waes.test.model.event.EventTypeEnum;
 import com.waes.test.observer.impl.ErrorsObserver;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,9 +40,9 @@ class ReprocessSchedulerTest {
         ProductDTO productDTO = new ProductDTO().id("1").name("name")
                 .price(new BigDecimal("12.01")).quantity(1);
 
-        errorsObserver.notifyObserver(productDTO, EventEnum.CREATE);
-        errorsObserver.notifyObserver(productDTO, EventEnum.UPDATE);
-        errorsObserver.notifyObserver(productDTO, EventEnum.DELETE);
+        errorsObserver.notifyObserver(productDTO, ActionEnum.CREATE, EventTypeEnum.RETRY);
+        errorsObserver.notifyObserver(productDTO, ActionEnum.UPDATE, EventTypeEnum.RETRY);
+        errorsObserver.notifyObserver(productDTO, ActionEnum.DELETE, EventTypeEnum.RETRY);
 
         scheduler.run();
 

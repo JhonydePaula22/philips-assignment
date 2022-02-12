@@ -7,19 +7,27 @@ import com.waes.test.model.ProductDTO;
 import com.waes.test.model.ProductsDTO;
 import com.waes.test.model.UpdateProductDTO;
 import com.waes.test.model.entity.ProductEntity;
-import com.waes.test.model.event.EventEnum;
+import com.waes.test.model.event.ActionEnum;
+import com.waes.test.model.event.EventTypeEnum;
 import com.waes.test.observer.Observer;
 import com.waes.test.repository.ProductRepository;
 import com.waes.test.service.ProductService;
 import com.waes.test.util.ProductsMapperUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+/**
+ * {@link Service} class to handle Operations with Product.
+ * Implements {@link ProductService} interface.
+ *
+ * @author jonathanadepaula
+ */
 @Service
 @Slf4j
 public class ProductServiceImpl implements ProductService {
@@ -71,26 +79,28 @@ public class ProductServiceImpl implements ProductService {
         log.info("Creating Product with data {}.", newProductDTO);
         ProductEntity productEntity = repository.save(ProductsMapperUtils.productEntityfrom(newProductDTO));
         ProductDTO productDTO = ProductsMapperUtils.productDtofrom(productEntity);
-        observer.notifyObserver(productDTO, EventEnum.CREATE);
+        observer.notifyObserver(productDTO, ActionEnum.CREATE, EventTypeEnum.PROPAGATE);
         return productDTO;
     }
 
     @Override
+    @CacheEvict(value = "product", key = "#productId")
     public ProductDTO updateProduct(UpdateProductDTO updateProductDTO, String productId) {
         log.info("Updating Product with data {} and id {}.", updateProductDTO, productId);
         validateId(productId);
         ProductEntity productEntity = repository.save(ProductsMapperUtils.productEntityfrom(updateProductDTO, productId));
         ProductDTO productDTO = ProductsMapperUtils.productDtofrom(productEntity);
-        observer.notifyObserver(productDTO, EventEnum.UPDATE);
+        observer.notifyObserver(productDTO, ActionEnum.UPDATE, EventTypeEnum.PROPAGATE);
         return productDTO;
     }
 
     @Override
+    @CacheEvict(value = "product", key = "#productId")
     public void deleteProduct(String productId) {
         log.info("Deleting product with id {}.", productId);
         validateId(productId);
         repository.deleteById(productId);
-        observer.notifyObserver(new ProductDTO().id(productId), EventEnum.DELETE);
+        observer.notifyObserver(new ProductDTO().id(productId), ActionEnum.DELETE, EventTypeEnum.PROPAGATE);
     }
 
     private void validateId(String productId) {

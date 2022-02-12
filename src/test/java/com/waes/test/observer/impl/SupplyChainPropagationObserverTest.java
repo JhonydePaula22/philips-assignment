@@ -1,8 +1,9 @@
 package com.waes.test.observer.impl;
 
 import com.waes.test.model.ProductDTO;
+import com.waes.test.model.event.ActionEnum;
 import com.waes.test.model.event.Event;
-import com.waes.test.model.event.EventEnum;
+import com.waes.test.model.event.EventTypeEnum;
 import com.waes.test.observer.datasource.ObserversQueues;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
@@ -22,14 +23,15 @@ class SupplyChainPropagationObserverTest {
         ProductDTO productDTO = new ProductDTO().id("1").name("name")
                 .price(new BigDecimal("12.01")).quantity(1);
 
-        supplyChainPropagationObserver.notifyObserver(productDTO, EventEnum.CREATE);
+        supplyChainPropagationObserver.notifyObserver(productDTO, ActionEnum.CREATE, EventTypeEnum.PROPAGATE);
 
         Assertions.assertTrue(ObserversQueues.containsPropagateEventsToReprocess());
         Assertions.assertEquals(Event.builder()
                 .id("1").name("name")
                 .price(new BigDecimal("12.01"))
                 .quantity(1)
-                .eventType(EventEnum.CREATE)
+                .action(ActionEnum.CREATE)
+                .eventType(EventTypeEnum.PROPAGATE)
                 .build(), ObserversQueues.poolPropagateEventsToBeReprocessed());
     }
 }
