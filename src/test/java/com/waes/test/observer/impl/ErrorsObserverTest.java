@@ -18,7 +18,6 @@ class ErrorsObserverTest {
     @Test
     @SneakyThrows
     void should_notify_observer_and_see_the_message_on_the_queue() {
-        //TODO REMOVE?
         Thread.sleep(5000);
         ProductDTO productDTO = new ProductDTO().id("1").name("name")
                 .price(new BigDecimal("12.01")).quantity(1);

@@ -28,7 +28,6 @@ import static io.restassured.RestAssured.with;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ProductsControllerTest {
 
-    // TODO (TESTS' PYRAMID) INTEGRATION SHOULD NOT RUN ALONGSIDE UNIT TESTS. THEY ARE MORE EXPENSIVE AND SHOULD BE RUN IN A CI FOR EXAMPLE.
     private static String id = "1";
 
     @BeforeEach
