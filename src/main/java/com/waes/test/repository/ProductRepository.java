@@ -1,6 +1,7 @@
 package com.waes.test.repository;
 
 import com.waes.test.model.entity.ProductEntity;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.repository.CrudRepository;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
  *
  * @author jonathanadepaula
  */
+@CacheConfig(cacheNames = "productsCache")
 public interface ProductRepository extends CrudRepository<ProductEntity, String> {
 
     /**

@@ -15,6 +15,7 @@ import com.waes.test.service.ProductService;
 import com.waes.test.util.ProductsMapperUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ import java.util.stream.StreamSupport;
  */
 @Service
 @Slf4j
+@CacheConfig(cacheNames = "productsCache")
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository repository;

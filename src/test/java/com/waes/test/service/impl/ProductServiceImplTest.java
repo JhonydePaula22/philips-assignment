@@ -32,16 +32,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 class ProductServiceImplTest {
 
+    @Captor
+    ArgumentCaptor<ProductEntity> productEntityArgumentCaptor;
     @Mock
     private ProductRepository repository;
     @Mock
     private SupplyChainIntegration supplyChainIntegration;
     @Mock
     private Observer<ProductDTO> observer;
-
-    @Captor
-    ArgumentCaptor<ProductEntity> productEntityArgumentCaptor;
-
     @InjectMocks
     private ProductServiceImpl service;
 

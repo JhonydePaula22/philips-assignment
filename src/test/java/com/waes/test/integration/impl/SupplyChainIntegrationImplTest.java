@@ -103,7 +103,7 @@ class SupplyChainIntegrationImplTest {
         Mockito.when(httpUtils.executeCall(ArgumentMatchers.any(Supplier.class)))
                 .thenThrow(new BadRequestException("We could not find a valid Product with the provided Id 1."));
 
-        Assertions.assertThrows(BadRequestException.class, () ->  integration.updateProduct(updateProductDTO, "1"));
+        Assertions.assertThrows(BadRequestException.class, () -> integration.updateProduct(updateProductDTO, "1"));
         Mockito.verify(httpUtils, Mockito.times(1)).executeCall(ArgumentMatchers.any(Supplier.class));
     }
 
@@ -126,7 +126,7 @@ class SupplyChainIntegrationImplTest {
         Mockito.when(httpUtils.executeCall(ArgumentMatchers.any(Supplier.class)))
                 .thenThrow(new BadRequestException("We could not find a valid Product with the provided Id 1."));
 
-        Assertions.assertThrows(BadRequestException.class, () ->  integration.deleteProduct("1"));
+        Assertions.assertThrows(BadRequestException.class, () -> integration.deleteProduct("1"));
         Mockito.verify(httpUtils, Mockito.times(1)).executeCall(ArgumentMatchers.any(Supplier.class));
     }
 }

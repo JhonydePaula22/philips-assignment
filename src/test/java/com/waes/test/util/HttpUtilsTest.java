@@ -38,24 +38,16 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 @ExtendWith(MockitoExtension.class)
 class HttpUtilsTest {
 
+    private static final String CUSTOMER_PATH = "/resource";
     private OkHttpClient client;
-
     @Mock
     private ObjectMapper mapper;
-
     private CircuitBreaker circuitBreaker;
-
     private Retry retry;
-
     @Mock
     private Observer<ProductDTO> productObserver;
-
     private HttpUtils httpUtils;
-
     private MockWebServer mockWebServer;
-
-    private static final String CUSTOMER_PATH = "/resource";
-
     private String url;
 
 
