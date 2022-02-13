@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 /**
- * {@link Component} class to handle Observer notifications whenever there is a need to propagate an Event to the upstream service.
+ * {@link Component} class to handle Observer notifications whenever there is a need to propagate an Event to the downstream service.
  * Implements {@link Observer<ProductDTO>} interface.
  *
  * @author jonathanadepaula
@@ -36,6 +36,13 @@ public class SupplyChainPropagationObserver implements Observer<ProductDTO> {
         this.queue = queue;
     }
 
+    /**
+     * Notifies that an Event to propagate data to the 3rd party API should be published SQS to be processed later.
+     *
+     * @param productDTO {@link ProductDTO}
+     * @param action     {@link ActionEnum}
+     * @param eventType  {@link EventTypeEnum}
+     */
     @Override
     public void notifyObserver(ProductDTO productDTO, ActionEnum action, EventTypeEnum eventType) {
         log.info("Adding new event to the queue to be reprocessed later. ProductDTO: {}, Action: {} ,EventType: {}", productDTO, action, eventType);
@@ -50,6 +57,11 @@ public class SupplyChainPropagationObserver implements Observer<ProductDTO> {
         publishEvent(event);
     }
 
+    /**
+     * Publishes event on SQS.
+     *
+     * @param message
+     */
     public void publishEvent(Event message) {
         log.info("Publishing propagate event : {}", message);
         SendMessageRequest sendMessageRequest;

@@ -44,7 +44,7 @@ class ProductServiceImplTest {
     private ProductServiceImpl service;
 
     @Test
-    void should_get_products_from_upstream() {
+    void should_get_products_from_downstream() {
         ProductsDTO expected = new ProductsDTO();
         Mockito.when(supplyChainIntegration.getProducts()).thenReturn(expected);
 
@@ -67,7 +67,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void should_get_product_from_upstream() {
+    void should_get_product_from_downstream() {
         ProductDTO expected = new ProductDTO();
         Mockito.when(supplyChainIntegration.getProduct("1")).thenReturn(expected);
 

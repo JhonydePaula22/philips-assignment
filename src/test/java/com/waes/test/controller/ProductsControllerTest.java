@@ -8,13 +8,14 @@ import com.waes.test.model.ProductsDTO;
 import com.waes.test.model.UpdateProductDTO;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
@@ -25,13 +26,14 @@ import static io.restassured.RestAssured.with;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ProductsControllerTest {
 
     private static String id = "1";
 
-    @BeforeEach
-    void setup() {
+    @BeforeAll
+    static void setup() {
         RestAssured.baseURI = TestConstants.BASE_URL;
         RestAssured.port = TestConstants.PORT;
     }

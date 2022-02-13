@@ -4,11 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -22,10 +24,17 @@ import redis.clients.jedis.Jedis;
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 
+/**
+ * Configuration class to configure cache accordingly with the flag informed.
+ * It can instantiate a Redis cache or a Local Cache.
+ *
+ * @author jonathanadepaula
+ */
 @Configuration
 @AutoConfigureAfter(RedisAutoConfiguration.class)
 @EnableCaching
 @Slf4j
+@ConditionalOnProperty(value = "local.cache", havingValue = "false")
 public class RedisConfig {
 
     @Autowired
@@ -37,6 +46,12 @@ public class RedisConfig {
     @Value("${spring.redis.port}")
     private int redisPort;
 
+    /**
+     * If redis cache is enabled, it instantiates a {@link RedisTemplate} bean.
+     *
+     * @param redisConnectionFactory
+     * @return {@link RedisTemplate}
+     */
     @Bean
     public RedisTemplate<String, Serializable> redisCacheTemplate(LettuceConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Serializable> template = new RedisTemplate<>();
@@ -46,7 +61,14 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean
+    /**
+     * If redis cache is enabled, it instantiates a {@link RedisCacheManager} bean.
+     *
+     * @param factory
+     * @return {@link RedisCacheManager}
+     */
+    @Bean("RedisCacheManager")
+    @Primary
     public CacheManager cacheManager(RedisConnectionFactory factory) {
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();
         RedisCacheConfiguration redisCacheConfiguration = config
@@ -59,6 +81,9 @@ public class RedisConfig {
         return redisCacheManager;
     }
 
+    /**
+     * Method to clean redis cache after it is instantiated to avoid it carrying data from previous executions.
+     */
     @PostConstruct
     public void clearCache() {
         log.info("Clearing cache");

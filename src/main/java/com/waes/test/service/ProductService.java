@@ -16,19 +16,19 @@ public interface ProductService {
     /**
      * Get a {@link ProductsDTO} which bundles a {@link java.util.List<ProductDTO>}.
      *
-     * @param upstream which indicates if the query should be made on an upstream service
+     * @param downstream which indicates if the query should be made on an downstream service
      * @return {@link ResponseEntity <ProductsDTO>}
      */
-    ProductsDTO getProducts(Boolean upstream);
+    ProductsDTO getProducts(Boolean downstream);
 
     /**
      * Gets a {@link ProductDTO}
      *
      * @param productId
-     * @param upstream  which indicates if the query should be made on an upstream service
+     * @param downstream which indicates if the query should be made on an downstream service
      * @return {@link ResponseEntity<ProductDTO>}
      */
-    ProductDTO getProduct(String productId, Boolean upstream);
+    ProductDTO getProduct(String productId, Boolean downstream);
 
     /**
      * Persists a {@link ProductDTO}.

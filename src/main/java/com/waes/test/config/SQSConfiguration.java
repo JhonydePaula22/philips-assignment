@@ -14,6 +14,11 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
 
+/**
+ * Configuration class to instantiate the AWS SQS {@link Bean} and its dependencies.
+ *
+ * @author jonathanadepaula
+ */
 @Configuration
 public class SQSConfiguration {
 
@@ -29,6 +34,11 @@ public class SQSConfiguration {
     @Value("${cloud.aws.end-point.uri}")
     private String sqsUrl;
 
+    /**
+     * Builds {@link AmazonSQSAsync} client based on the properties provided.
+     *
+     * @return {@link AmazonSQSAsync}
+     */
     @Bean
     @Primary
     public AmazonSQSAsync amazonSQSAsync() {
@@ -38,11 +48,23 @@ public class SQSConfiguration {
                 .build();
     }
 
+    /**
+     * Builds a {@link QueueMessagingTemplate}.
+     *
+     * @param amazonSQSAsync
+     * @return {@link QueueMessagingTemplate}
+     */
     @Bean
-    public QueueMessagingTemplate queueMessagingTemplate() {
-        return new QueueMessagingTemplate(amazonSQSAsync());
+    public QueueMessagingTemplate queueMessagingTemplate(AmazonSQSAsync amazonSQSAsync) {
+        return new QueueMessagingTemplate(amazonSQSAsync);
     }
 
+    /**
+     * Builds the {@link MessageConverter} needed to convert the messages.
+     *
+     * @param objectMapper
+     * @return {@link MessageConverter}
+     */
     @Bean
     protected MessageConverter messageConverter(ObjectMapper objectMapper) {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();

@@ -26,7 +26,7 @@ paths:
       operationId: getProduct
       parameters:
         - $ref: "#/components/parameters/id"
-        - $ref: "#/components/parameters/upstream"
+        - $ref: "#/components/parameters/downstream"
       responses:
         200:
           description: Success
@@ -108,7 +108,7 @@ paths:
       summary: Method to handle GET requests. Returns a Products List
       operationId: getProducts
       parameters:
-        - $ref: "#/components/parameters/upstream"
+        - $ref: "#/components/parameters/downstream"
       responses:
         200:
           description: Success
@@ -163,8 +163,8 @@ components:
         example: "d184e0c9-c80c-4918-a8c1-c4e24c6b32cb"
       required: true
       description: ID of the Product
-    upstream:
-      name: upstream
+    downstream:
+      name: downstream
       in: query
       schema:
         type: string

@@ -43,23 +43,23 @@ public class ProductsController implements V1Api {
      * Gets a {@link ProductDTO}
      *
      * @param id
-     * @param upstream which indicates if the query should be made on an upstream service
+     * @param downstream which indicates if the query should be made on an downstream service
      * @return {@link ResponseEntity<ProductDTO>}
      */
     @Override
-    public ResponseEntity<ProductDTO> getProduct(@PathVariable(value = "id") String id, @RequestParam(value = "upstream", required = false, defaultValue = "false") String upstream) {
-        return ResponseEntity.ok(productService.getProduct(id, Boolean.valueOf(upstream)));
+    public ResponseEntity<ProductDTO> getProduct(@PathVariable(value = "id") String id, @RequestParam(value = "downstream", required = false, defaultValue = "false") String downstream) {
+        return ResponseEntity.ok(productService.getProduct(id, Boolean.valueOf(downstream)));
     }
 
     /**
      * Get a {@link ProductsDTO} which bundles a {@link java.util.List<ProductDTO>}.
      *
-     * @param upstream which indicates if the query should be made on an upstream service
+     * @param downstream which indicates if the query should be made on an downstream service
      * @return {@link ResponseEntity<ProductsDTO>}
      */
     @Override
-    public ResponseEntity<ProductsDTO> getProducts(@RequestParam(value = "upstream", required = false, defaultValue = "false") String upstream) {
-        return ResponseEntity.ok(productService.getProducts(Boolean.valueOf(upstream)));
+    public ResponseEntity<ProductsDTO> getProducts(@RequestParam(value = "downstream", required = false, defaultValue = "false") String downstream) {
+        return ResponseEntity.ok(productService.getProducts(Boolean.valueOf(downstream)));
     }
 
     /**

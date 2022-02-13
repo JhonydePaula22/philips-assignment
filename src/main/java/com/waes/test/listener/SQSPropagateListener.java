@@ -6,16 +6,28 @@ import com.waes.test.model.UpdateProductDTO;
 import com.waes.test.model.event.Event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * {@link Component} class to handle communication between the application and SQS.
+ * Specifically this bean handles the propagation events.
+ *
+ * @author jonathanadepaula
+ */
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "sqs.enabled", havingValue = "true")
 public class SQSPropagateListener {
 
     private final SupplyChainIntegration service;
 
+    /**
+     * Consumes {@link Event} and process them accordingly.
+     * @param event
+     */
     @SqsListener("${cloud.aws.queue.propagate.queue.name}")
     public void receiveMessage(Event event) {
         log.info("Receiving message to propagate events");

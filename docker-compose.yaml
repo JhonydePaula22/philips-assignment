@@ -22,10 +22,3 @@ services:
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
     ports:
       - "6379:6379"
-  app:
-    build: .
-    ports:
-      - "8080:8080"
-    depends_on:
-      - local-stack-aws
-      - redis-local

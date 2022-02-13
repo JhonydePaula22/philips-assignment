@@ -36,6 +36,13 @@ public class ErrorsObserver implements Observer<ProductDTO> {
         this.queue = queue;
     }
 
+    /**
+     * Notifies that an Error has occurred while propagating an Event to the 3rd party API and publishes it on SQS to be reprocessed later.
+     *
+     * @param productDTO {@link ProductDTO}
+     * @param action     {@link ActionEnum}
+     * @param eventType  {@link EventTypeEnum}
+     */
     @Override
     public void notifyObserver(ProductDTO productDTO, ActionEnum action, EventTypeEnum eventType) {
         log.info("Adding new event to the queue to be reprocessed later. ProductDTO: {}, Action: {}, EventType: {}", productDTO, action, eventType);
@@ -50,6 +57,11 @@ public class ErrorsObserver implements Observer<ProductDTO> {
         publishEvent(event);
     }
 
+    /**
+     * Publishes event on SQS.
+     *
+     * @param message
+     */
     public void publishEvent(Event message) {
         log.info("Generating event : {}", message);
         SendMessageRequest sendMessageRequest = null;

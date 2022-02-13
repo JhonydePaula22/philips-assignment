@@ -9,7 +9,7 @@ import lombok.NonNull;
 import java.math.BigDecimal;
 
 /**
- * Event class which represents the events that should be reprocessed or propagated to upstream service.
+ * Event class which represents the events that should be reprocessed or propagated to downstream service.
  *
  * @author jonathanadepaula
  */

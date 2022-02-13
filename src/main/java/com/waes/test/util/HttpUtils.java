@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
- * {@link Component} class that bundles the {@link OkHttpClient} client and the need operations to make Http calls to the upstream service.
+ * {@link Component} class that bundles the {@link OkHttpClient} client and the need operations to make Http calls to the downstream service.
  *
  * @author jonathanadepaula
  */

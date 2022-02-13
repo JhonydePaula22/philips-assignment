@@ -48,8 +48,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductsDTO getProducts(Boolean upstream) {
-        if (upstream) {
+    public ProductsDTO getProducts(Boolean downstream) {
+        if (downstream) {
             return supplyChainIntegration.getProducts();
         }
 
@@ -63,8 +63,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO getProduct(String productId, Boolean upstream) {
-        if (upstream) {
+    public ProductDTO getProduct(String productId, Boolean downstream) {
+        if (downstream) {
             return supplyChainIntegration.getProduct(productId);
         }
 
